@@ -1,0 +1,29 @@
+type: http_request
+model: http_request
+id: rq_XkXUSJTgxg
+createdAt: 2025-12-29T09:05:43.930153500
+updatedAt: 2025-12-29T11:04:26.908190900
+workspaceId: wk_GmREP2U9P8
+folderId: null
+authentication: {}
+authenticationType: null
+body:
+  text: |-
+    {
+      "email": "test@example.com",
+      "password": "Password123!",
+      "firstName": "Test",
+      "lastName": "User"
+    }
+bodyType: application/json
+description: ''
+headers:
+- enabled: true
+  name: Content-Type
+  value: application/json
+  id: h820KprqQb
+method: POST
+name: Health Checkn
+sortPriority: -1766999143927.0
+url: ${[ base_url ]}/api/users/register
+urlParameters: []
