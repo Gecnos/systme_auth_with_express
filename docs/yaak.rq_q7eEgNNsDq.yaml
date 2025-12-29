@@ -1,0 +1,35 @@
+type: http_request
+model: http_request
+id: rq_q7eEgNNsDq
+createdAt: 2025-12-29T10:58:18.852657800
+updatedAt: 2025-12-29T11:02:07.683360300
+workspaceId: wk_GmREP2U9P8
+folderId: null
+authentication: {}
+authenticationType: null
+body:
+  text: |-
+    {
+      "email": "john.doe@example.com",
+      "password": "Password123!"
+    }
+bodyType: application/json
+description: ''
+headers:
+- enabled: true
+  name: Authorization
+  value: Bearer {{token}}
+  id: W06WnzWvVP
+- enabled: true
+  name: ''
+  value: ''
+  id: U5q4gn9pTA
+- enabled: true
+  name: Content-Type
+  value: application/json
+  id: PXHuYNjrhg
+method: GET
+name: ''
+sortPriority: -1766999143927.0
+url: ${[ base_url ]}/api/users/test-rate-limit
+urlParameters: []
