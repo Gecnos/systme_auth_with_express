@@ -1,0 +1,29 @@
+type: http_request
+model: http_request
+id: rq_XkXUSJTgxg
+createdAt: 2025-12-29T09:05:43.930153500
+updatedAt: 2025-12-29T09:06:18.994368200
+workspaceId: wk_GmREP2U9P8
+folderId: null
+authentication: {}
+authenticationType: null
+body:
+  text: |-
+    {
+      "email": "dev@test.com",
+      "password": "MonPasswordSecurisé123",
+      "firstName": "Jean",
+      "lastName": "Dev"
+    }
+bodyType: application/json
+description: ''
+headers:
+- enabled: true
+  name: Content-Type
+  value: application/json
+  id: h820KprqQb
+method: POST
+name: Register
+sortPriority: -1766999143927.0
+url: ${base_url}/api/users/register
+urlParameters: []
