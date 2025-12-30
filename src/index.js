@@ -4,6 +4,7 @@ import { errorHandler } from './middlewares/error-handler.js';
 import { notFoundHandler } from './middlewares/not-found.js';
 import userRouter from './routes/user.routes.js';
 
+
 const app = express();
 
 app.use(express.json());
