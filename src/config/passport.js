@@ -1,33 +1,34 @@
-import passport from 'passport';
-import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
-import { PrismaClient } from '@prisma/client';
-
+const passport = require('passport');
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 passport.use(new GoogleStrategy({
-    clientID: process.env.GOOGLE_CLIENT_ID || '',
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     callbackURL: "/api/auth/google/callback"
   },
   async (accessToken, refreshToken, profile, done) => {
     try {
-      const email = profile.emails?.[0].value;
+      const email = profile.emails[0].value;
       
-      // 1. Chercher si le compte OAuth existe déjà
-      const oauthAccount = await prisma.oAuthAccount.findUnique({
-        where: { provider_providerId: { provider: 'GOOGLE', providerId: profile.id } },
+      // 1. Vérifier si un compte Google est déjà lié
+      let oauthAccount = await prisma.oAuthAccount.findUnique({
+        where: {
+          provider_providerId: { provider: 'GOOGLE', providerId: profile.id }
+        },
         include: { user: true }
       });
 
       if (oauthAccount) return done(null, oauthAccount.user);
 
-      // 2. Si non, chercher l'utilisateur par email ou le créer
+      // 2. Sinon, lier à un utilisateur existant ou en créer un nouveau
       const user = await prisma.user.upsert({
         where: { email },
         update: {},
         create: {
-          email: email || '',
-          emailVerifiedAt: new Date(), // Google vérifie  
+          email: email,
+          emailVerifiedAt: new Date(), // Google certifie l'email
           oAuthAccounts: {
             create: { provider: 'GOOGLE', providerId: profile.id }
           }
@@ -36,7 +37,7 @@ passport.use(new GoogleStrategy({
 
       return done(null, user);
     } catch (error) {
-      return done(error);
+      return done(error, null);
     }
   }
 ));
