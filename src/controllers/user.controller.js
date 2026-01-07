@@ -1,11 +1,10 @@
-const prisma = require('../lib/prisma');
-const { NotFoundError, ForbiddenError } = require('../lib/errors');
+import prisma from '../lib/prisma.js';
+import { NotFoundException } from '../lib/exceptions.js';
 
-// Consulter son profil
-const getProfile = async (req, res, next) => {
+export const getProfile = async (req, res, next) => {
   try {
     const user = await prisma.user.findUnique({
-      where: { id: req.user.id },
+      where: { id: req.user.userId },
       select: {
         id: true,
         email: true,
@@ -19,7 +18,7 @@ const getProfile = async (req, res, next) => {
     });
 
     if (!user) {
-      throw new NotFoundError('Utilisateur non trouvé');
+      throw new NotFoundException('Utilisateur non trouvé');
     }
 
     res.json(user);
@@ -28,13 +27,12 @@ const getProfile = async (req, res, next) => {
   }
 };
 
-// Mettre à jour son profil
-const updateProfile = async (req, res, next) => {
+export const updateProfile = async (req, res, next) => {
   try {
     const { firstName, lastName } = req.body;
     
     const updatedUser = await prisma.user.update({
-      where: { id: req.user.id },
+      where: { id: req.user.userId },
       data: {
         firstName,
         lastName,
@@ -57,20 +55,18 @@ const updateProfile = async (req, res, next) => {
   }
 };
 
-// Supprimer son compte
-const deleteAccount = async (req, res, next) => {
+export const deleteAccount = async (req, res, next) => {
   try {
     await prisma.user.update({
-      where: { id: req.user.id },
+      where: { id: req.user.userId },
       data: {
         disabledAt: new Date()
       }
     });
 
-    // Invalider tous les refresh tokens
     await prisma.refreshToken.updateMany({
       where: { 
-        userId: req.user.id,
+        userId: req.user.userId,
         revokedAt: null
       },
       data: {
@@ -78,13 +74,12 @@ const deleteAccount = async (req, res, next) => {
       }
     });
 
-    // Ajouter le token d'accès actuel à la blacklist
     const token = req.headers.authorization?.split(' ')[1];
     if (token) {
       await prisma.blacklistedAccessToken.create({
         data: {
           token,
-          userId: req.user.id,
+          userId: req.user.userId,
           expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24h
         }
       });
@@ -96,12 +91,11 @@ const deleteAccount = async (req, res, next) => {
   }
 };
 
-// Lister les sessions actives
-const listSessions = async (req, res, next) => {
+export const listSessions = async (req, res, next) => {
   try {
     const sessions = await prisma.refreshToken.findMany({
       where: {
-        userId: req.user.id,
+        userId: req.user.userId,
         revokedAt: null,
         expiresAt: {
           gt: new Date()
@@ -125,8 +119,7 @@ const listSessions = async (req, res, next) => {
   }
 };
 
-// Révoquer une session spécifique
-const revokeSession = async (req, res, next) => {
+export const revokeSession = async (req, res, next) => {
   try {
     const { sessionId } = req.params;
 
@@ -134,8 +127,8 @@ const revokeSession = async (req, res, next) => {
       where: { id: sessionId }
     });
 
-    if (!session || session.userId !== req.user.id) {
-      throw new NotFoundError('Session non trouvée');
+    if (!session || session.userId !== req.user.userId) {
+      throw new NotFoundException('Session non trouvée');
     }
 
     await prisma.refreshToken.update({
@@ -149,13 +142,12 @@ const revokeSession = async (req, res, next) => {
   }
 };
 
-// Révoquer toutes les autres sessions
-const revokeOtherSessions = async (req, res, next) => {
+export const revokeOtherSessions = async (req, res, next) => {
   try {
     await prisma.refreshToken.updateMany({
       where: { 
-        userId: req.user.id,
-        id: { not: req.user.sessionId }, // Ne pas révoquer la session actuelle
+        userId: req.user.userId,
+        id: { not: req.user.sessionId }, 
         revokedAt: null
       },
       data: { revokedAt: new Date() }
@@ -167,7 +159,7 @@ const revokeOtherSessions = async (req, res, next) => {
   }
 };
 
-module.exports = {
+export default {
   getProfile,
   updateProfile,
   deleteAccount,

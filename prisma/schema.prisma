@@ -1,24 +1,23 @@
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite" 
+  provider = "sqlite"
 }
 
 model User {
-  id                     String                   @id @default(cuid())
-  email                  String                   @unique
-  password               String
-  firstName              String
-  lastName               String
+  id                     String                   
+  email                  String                   
+  password               String?                  
+  firstName              String?
+  lastName               String?
   emailVerifiedAt        DateTime?
   twoFactorSecret        String?
   twoFactorEnabledAt     DateTime?
   disabledAt             DateTime?
-  createdAt              DateTime                 @default(now())
-  updatedAt              DateTime                 @updatedAt
+  createdAt              DateTime                 
+  updatedAt              DateTime                 
   
   // Relations
   oAuthAccounts          OAuthAccount[]
@@ -30,11 +29,11 @@ model User {
 }
 
 model OAuthAccount {
-  id         String   @id @default(cuid())
+  id         String   
   provider   String
   providerId String
   userId     String
-  createdAt  DateTime @default(now())
+  createdAt  DateTime 
 
   // Relation
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -90,13 +89,14 @@ model PasswordResetToken {
 }
 
 model LoginHistory {
-  id         String   @id @default(cuid())
-  userId     String
-  ipAddress  String?
-  userAgent  String?
-  success    Boolean
-  createdAt  DateTime @default(now())
+  id          String   @id @default(cuid())
+  userId      String
+  ipAddress   String?
+  userAgent   String?
+  success     Boolean
+  loginMethod String?  // "standard", "oauth", "2fa"
+  createdAt   DateTime @default(now())
 
   // Relation
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

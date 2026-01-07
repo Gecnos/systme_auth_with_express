@@ -1,68 +1,104 @@
-const { authenticator } = require('otplib');
-const QRCode = require('qrcode');
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+import twoFactorService from '../services/2fa.service.js';
+import authService from '../services/oauth.service.js';
+import asyncHandler from '../lib/async-handler.js';
+import * as jwtLib from '../lib/jwt.js';
 
+class TwoFactorController {
+ 
+  getStatus = asyncHandler(async (req, res) => {
+    const userId = req.user.id;
+    const status = await twoFactorService.getStatus(userId);
+    res.json(status);
+  });
 
-exports.enable2FA = async (req, res) => {
+ 
+  enable = asyncHandler(async (req, res) => {
+    const userId = req.user.id;
+    const { secret, qrCode } = await twoFactorService.generateSecret(userId);
+
+    res.json({
+      message: 'Scannez ce QR code avec votre application d\'authentification',
+      secret,
+      qrCode,
+    });
+  });
+
+ 
+  verify = asyncHandler(async (req, res) => {
+    const userId = req.user.id;
+    const { token } = req.body;
+
+    if (!token || token.length !== 6) {
+      return res.status(400).json({ error: 'Code invalide (6 chiffres requis)' });
+    }
+
+    const verified = await twoFactorService.verifyAndEnable(userId, token);
+
+    if (!verified) {
+      return res.status(400).json({ error: 'Code incorrect' });
+    }
+
+    res.json({
+      message: '2FA activé avec succès',
+      enabled: true,
+    });
+  });
+
+ 
+  verifyLogin = asyncHandler(async (req, res) => {
+    const { token, twoFactorToken } = req.body;
+
+    if (!token || !twoFactorToken) {
+      return res.status(400).json({ error: 'Paramètres manquants' });
+    }
+
+    // Décoder le token temporaire
+    let decoded;
     try {
-        const user = await prisma.user.findUnique({ where: { id: req.user.id } });
-        
-        // Générer un secret unique et un QR Code
-        const secret = authenticator.generateSecret();
-        const otpauth = authenticator.keyuri(user.email, 'API_Auth', secret);
-        const qrCodeUrl = await QRCode.toDataURL(otpauth);
-
-        // Stocker le secret temporairement
-        await prisma.user.update({
-            where: { id: req.user.id },
-            data: { twoFactorSecret: secret }
-        });
-
-        res.json({ 
-            qrCodeUrl, 
-            message: "Scannez le QR Code avec Google Authenticator ou Authy." 
-        });
+      decoded = jwtLib.verify(twoFactorToken, process.env.JWT_ACCESS_SECRET);
     } catch (error) {
-        res.status(500).json({ error: "Erreur lors de la génération du 2FA" });
-    }
-};
-
-// confirmation du 2FA
-
-exports.confirm2FA = async (req, res) => {
-    const { code } = req.body;
-    const user = await prisma.user.findUnique({ where: { id: req.user.id } });
-
-    const isValid = authenticator.verify({ token: code, secret: user.twoFactorSecret });
-
-    if (isValid) {
-        await prisma.user.update({
-            where: { id: req.user.id },
-            data: { twoFactorEnabledAt: new Date() }
-        });
-        return res.json({ message: "2FA activé avec succès !" });
+      return res.status(401).json({ error: 'Token expiré ou invalide' });
     }
 
-    res.status(400).json({ error: "Code invalide. Réessayez." });
-};
-
-// verification au login
-exports.verify2FALogin = async (req, res) => {
-    const { userId, code } = req.body;
-    const user = await prisma.user.findUnique({ where: { id: userId } });
-
-    if (!user || !user.twoFactorSecret) {
-        return res.status(404).json({ error: "Utilisateur ou configuration introuvable" });
+    if (decoded.purpose !== '2fa-pending') {
+      return res.status(401).json({ error: 'Token invalide' });
     }
 
-    const isValid = authenticator.verify({ token: code, secret: user.twoFactorSecret });
+    // Vérifier le code 2FA
+    const verified = await twoFactorService.verifyToken(decoded.userId, token);
 
-    if (isValid) {
-        //  fonction de Ferdinande pour générer les JWT
-       
-        return res.json({ message: "Authentification réussie", tokens: "VOS_JWT_ICI" });
+    if (!verified) {
+      return res.status(400).json({ error: 'Code incorrect' });
     }
 
-    res.status(401).json({ error: "Code OTP incorrect" });
-};
+    // Générer les tokens finaux
+    const ipAddress = req.ip || req.socket.remoteAddress || 'unknown';
+    const userAgent = req.get('user-agent') || 'unknown';
+    
+    const tokens = await authService.generateTokens(decoded.userId, ipAddress, userAgent);
+
+    res.json({
+      message: 'Connexion réussie avec 2FA',
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
+    });
+  });
+
+ 
+  disable = asyncHandler(async (req, res) => {
+    const userId = req.user.id;
+    const { password } = req.body;
+
+    if (!password) {
+      return res.status(400).json({ error: 'Mot de passe requis' });
+    }
+
+
+    await authService.verifyPassword(userId, password);
+
+    const result = await twoFactorService.disable(userId);
+    res.json(result);
+  });
+}
+
+export default new TwoFactorController();
