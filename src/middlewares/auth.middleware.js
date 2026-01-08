@@ -7,18 +7,21 @@ export const authMiddleware = async (req, res, next) => {
     const authHeader = req.headers.authorization;
     const token = authHeader && authHeader.split(' ')[1];
 
-    if (!token) throw new UnauthorizedException("Token miss");
+    if (!token) {
+      throw new UnauthorizedException("Token manquant");
+    }
 
-    // Verification de la Blacklist (via Prisma)
     const isBlacklisted = await prisma.blacklistedAccessToken.findUnique({
       where: { token }
     });
-    if (isBlacklisted) throw new UnauthorizedException("Token revoke");
 
-    // Verification du JWT
+    if (isBlacklisted) {
+      throw new UnauthorizedException("Token révoqué");
+    }
+
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     
-    req.user = decoded; 
+    req.user = decoded;
     
     next();
   } catch (error) {
