@@ -1,19 +1,19 @@
 import twoFactorService from '../services/2fa.service.js';
-import authService from '../services/oauth.service.js';
+import tokenService from '../services/token.service.js';
 import asyncHandler from '../lib/async-handler.js';
-import * as jwtLib from '../lib/jwt.js';
+import jwt from 'jsonwebtoken';
 
 class TwoFactorController {
  
   getStatus = asyncHandler(async (req, res) => {
-    const userId = req.user.id;
+    const userId = req.user.userId;
     const status = await twoFactorService.getStatus(userId);
     res.json(status);
   });
 
  
   enable = asyncHandler(async (req, res) => {
-    const userId = req.user.id;
+    const userId = req.user.userId;
     const { secret, qrCode } = await twoFactorService.generateSecret(userId);
 
     res.json({
@@ -25,7 +25,7 @@ class TwoFactorController {
 
  
   verify = asyncHandler(async (req, res) => {
-    const userId = req.user.id;
+    const userId = req.user.userId;
     const { token } = req.body;
 
     if (!token || token.length !== 6) {
@@ -52,10 +52,9 @@ class TwoFactorController {
       return res.status(400).json({ error: 'Paramètres manquants' });
     }
 
-    // Décoder le token temporaire
     let decoded;
     try {
-      decoded = jwtLib.verify(twoFactorToken, process.env.JWT_ACCESS_SECRET);
+      decoded = jwt.verify(twoFactorToken, process.env.JWT_SECRET);
     } catch (error) {
       return res.status(401).json({ error: 'Token expiré ou invalide' });
     }
@@ -64,18 +63,18 @@ class TwoFactorController {
       return res.status(401).json({ error: 'Token invalide' });
     }
 
-    // Vérifier le code 2FA
     const verified = await twoFactorService.verifyToken(decoded.userId, token);
 
     if (!verified) {
       return res.status(400).json({ error: 'Code incorrect' });
     }
 
-    // Générer les tokens finaux
     const ipAddress = req.ip || req.socket.remoteAddress || 'unknown';
     const userAgent = req.get('user-agent') || 'unknown';
     
-    const tokens = await authService.generateTokens(decoded.userId, ipAddress, userAgent);
+    // TODO Ferdinande: Créer tokenService.generateTokens(userId, ipAddress, userAgent)
+    // Doit retourner { accessToken, refreshToken }
+    const tokens = await tokenService.generateTokens(decoded.userId, ipAddress, userAgent);
 
     res.json({
       message: 'Connexion réussie avec 2FA',
@@ -86,14 +85,15 @@ class TwoFactorController {
 
  
   disable = asyncHandler(async (req, res) => {
-    const userId = req.user.id;
+    const userId = req.user.userId;
     const { password } = req.body;
 
     if (!password) {
       return res.status(400).json({ error: 'Mot de passe requis' });
     }
 
-
+    // Ferdinande: Créer authService.verifyPassword(userId, password)
+    // une exception si le mot de passe est incorrect
     await authService.verifyPassword(userId, password);
 
     const result = await twoFactorService.disable(userId);
