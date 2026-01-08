@@ -1,25 +1,29 @@
 import prisma from '../lib/prisma.js';
-import * as jwtLib from '../lib/jwt.js';
+import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 
 class OAuthService {
-  
 
-  async generateTokensForOAuthUser(user, ipAddress, userAgent) {
-    const accessToken = jwtLib.sign(
-      { userId: user.id, email: user.email },
+  async generateTokens(userId, ipAddress, userAgent) {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { email: true },
+    });
+
+    const accessToken = jwt.sign(
+      { userId, email: user.email },
       process.env.JWT_SECRET,
       { expiresIn: '15m' }
     );
 
     const refreshTokenString = crypto.randomBytes(64).toString('hex');
     const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + 30); // 30 jours
+    expiresAt.setDate(expiresAt.getDate() + 30);
 
     await prisma.refreshToken.create({
       data: {
         token: refreshTokenString,
-        userId: user.id,
+        userId,
         expiresAt,
         ipAddress,
         userAgent,
@@ -28,7 +32,7 @@ class OAuthService {
 
     await prisma.loginHistory.create({
       data: {
-        userId: user.id,
+        userId,
         ipAddress,
         userAgent,
         success: true,
@@ -42,25 +46,13 @@ class OAuthService {
     };
   }
 
-  
-   
-  async requiresTwoFactor(userId) {
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { twoFactorSecret: true, twoFactorEnabledAt: true },
-    });
-
-    return !!(user?.twoFactorSecret && user?.twoFactorEnabledAt);
-  }
-
   generateTwoFactorToken(userId) {
-    return jwtLib.sign(
+    return jwt.sign(
       { userId, purpose: '2fa-pending' },
       process.env.JWT_SECRET,
       { expiresIn: '10m' }
     );
   }
-
 
   async unlinkProvider(userId, provider) {
     const user = await prisma.user.findUnique({
