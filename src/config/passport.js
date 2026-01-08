@@ -52,8 +52,8 @@ passport.use(
             email,
             firstName: profile.name?.givenName || '',
             lastName: profile.name?.familyName || '',
-            emailVerifiedAt: new Date(), 
-            oAuthAccounts: {  
+            emailVerifiedAt: new Date(),
+            oAuthAccounts: {
               create: {
                 provider: 'google',
                 providerId: profile.id,
