@@ -18,19 +18,16 @@ class TwoFactorService {
       throw new Error('2FA déjà activé');
     }
 
-    // Générer un nouveau 
     const secret = speakeasy.generateSecret({
       name: `AuthAPI (${user.email})`,
       issuer: 'AuthAPI',
     });
 
-    // Stocker le secret temporairement (pas encore activé)
     await prisma.user.update({
       where: { id: userId },
       data: { twoFactorSecret: secret.base32 },
     });
 
-    // Générer le QR code
     const qrCodeUrl = await QRCode.toDataURL(secret.otpauth_url);
 
     return {
@@ -49,12 +46,11 @@ class TwoFactorService {
       throw new Error('2FA non configuré');
     }
 
-    // Vérifier le code
     const verified = speakeasy.totp.verify({
       secret: user.twoFactorSecret,
       encoding: 'base32',
       token,
-      window: 2, // 
+      window: 4,
     });
 
     if (!verified) {
@@ -71,7 +67,6 @@ class TwoFactorService {
     return true;
   }
 
-  
   async verifyToken(userId, token) {
     const user = await prisma.user.findUnique({
       where: { id: userId },
@@ -86,11 +81,10 @@ class TwoFactorService {
       secret: user.twoFactorSecret,
       encoding: 'base32',
       token,
-      window: 2,
+      window: 4,
     });
   }
 
- 
   async disable(userId) {
     const user = await prisma.user.findUnique({
       where: { id: userId },
@@ -101,7 +95,6 @@ class TwoFactorService {
       throw new Error('2FA déjà désactivé');
     }
 
-   
     await prisma.user.update({
       where: { id: userId },
       data: {
@@ -113,7 +106,6 @@ class TwoFactorService {
     return { message: '2FA désactivé avec succès' };
   }
 
-  
   async getStatus(userId) {
     const user = await prisma.user.findUnique({
       where: { id: userId },
