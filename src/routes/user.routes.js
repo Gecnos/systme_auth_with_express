@@ -17,4 +17,7 @@ router.get('/sessions', userController.listSessions);
 router.delete('/sessions/:sessionId', userController.revokeSession);
 router.delete('/sessions', userController.revokeOtherSessions);
 
+// Historique de connexion
+router.get('/history', userController.getLoginHistory);
+
 export default router;

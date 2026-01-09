@@ -30,7 +30,7 @@ export const getProfile = async (req, res, next) => {
 export const updateProfile = async (req, res, next) => {
   try {
     const { firstName, lastName } = req.body;
-    
+
     const updatedUser = await prisma.user.update({
       where: { id: req.user.userId },
       data: {
@@ -65,7 +65,7 @@ export const deleteAccount = async (req, res, next) => {
     });
 
     await prisma.refreshToken.updateMany({
-      where: { 
+      where: {
         userId: req.user.userId,
         revokedAt: null
       },
@@ -142,18 +142,23 @@ export const revokeSession = async (req, res, next) => {
   }
 };
 
-export const revokeOtherSessions = async (req, res, next) => {
+export const getLoginHistory = async (req, res, next) => {
   try {
-    await prisma.refreshToken.updateMany({
-      where: { 
-        userId: req.user.userId,
-        id: { not: req.user.sessionId }, 
-        revokedAt: null
-      },
-      data: { revokedAt: new Date() }
+    const history = await prisma.loginHistory.findMany({
+      where: { userId: req.user.userId },
+      orderBy: { createdAt: 'desc' },
+      take: 20,
+      select: {
+        id: true,
+        ipAddress: true,
+        userAgent: true,
+        success: true,
+        loginMethod: true,
+        createdAt: true
+      }
     });
 
-    res.status(204).send();
+    res.json(history);
   } catch (error) {
     next(error);
   }
@@ -165,5 +170,6 @@ export default {
   deleteAccount,
   listSessions,
   revokeSession,
-  revokeOtherSessions
+  revokeOtherSessions,
+  getLoginHistory
 };
