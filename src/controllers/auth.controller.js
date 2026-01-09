@@ -1,5 +1,6 @@
 import asyncHandler from "#lib/async-handler";
 import prisma from '../lib/prisma.js';
+import tokenService from "#services/token.service";
 import * as argon from "argon2"
 
 class AuthController {
@@ -31,45 +32,37 @@ class AuthController {
         });
     })
 
-    signin = asyncHandler(async (req, res) => {
-      const { refreshToken } = req.cookies; 
-    
-      if (!refreshToken) return res.status(401).send("Session expirée");
-    
-      // Trouver le token en DB
-      const savedToken = await prisma.refreshToken.findUnique({
-        where: { token: refreshToken },
-        include: { user: true }
-      });
-    
-      // DETECTION DE VOL / REUTILISATION :
-      // Si le token n'existe pas ou est déjà marqué comme révoqué
-      if (!savedToken || savedToken.revoked) {
-        if (savedToken) {
-          // Quelqu'un réutilise un token déjà utilisé ! 
-          // On révoque TOUS les tokens de cet utilisateur par précaution.
-          await prisma.refreshToken.deleteMany({ where: { userId: savedToken.userId } });
+    signin = asyncHandler(async (req, res, next) => {
+        const { email, password } = req.body;
+
+        // Validate email and password
+        if (!email || !password) {
+            return next(new Error("Please provide email and password"));
         }
-        return res.status(403).send("Tentative de réutilisation détectée");
-      }
-    
-      // Vérifier expiration
-      if (new Date() > savedToken.expiresAt) {
-        await prisma.refreshToken.delete({ where: { id: savedToken.id } });
-        return res.status(401).send("Refresh token expiré");
-      }
-    
-      // --- ROTATION EFFECTIVE ---
-      
-      // 1. Invalider l'ancien token
-      await prisma.refreshToken.delete({ where: { id: savedToken.id } });
-    
-      // 2. Générer le nouveau duo
-      const tokens = await generateAuthTokens(savedToken.user);
-    
-      // 3. Envoyer les nouveaux tokens (Cookie + JSON)
-      res.cookie('refreshToken', tokens.refresh.token, { httpOnly: true, secure: true });
-      res.json({ accessToken: tokens.access.token, refreshToken: tokens.refresh.token });
+
+        // Check if user exists
+        const user = await prisma.user.findUnique({ where: { email } });
+        if (!user) {
+            return next(new Error("Invalid email or password"));
+        }
+        
+        // Verify password
+        const isValid = await argon.verify(user.password, password);
+        if (!isValid) {
+            return next(new Error("Invalid email or password"));
+        }
+
+        // Generate tokens
+        const tokens = await tokenService.generateAuthTokens(user);
+
+        res.status(200).json({
+            status: "success",
+            data: {
+                user,
+                accessToken: tokens.access.token,
+                refreshToken: tokens.refresh.token
+            }
+        });
     })
 
     refreshTokens = asyncHandler(async (req, res, next) => {
@@ -90,7 +83,7 @@ class AuthController {
         }
 
         // Generate new tokens
-        const tokens = await generateAuthTokens(tokenData.user);
+        const tokens = await tokenService.generateAuthTokens(tokenData.user);
 
         // Set new refresh token in cookies
         res.cookie('refreshToken', tokens.refresh.token, { httpOnly: true, secure: true });
@@ -105,8 +98,7 @@ class AuthController {
 
     logout = asyncHandler(async (req, res) => {
       try {
-        const { refreshToken } = req.cookies;
-        const accessToken = req.token; // Récupéré depuis le middleware 'protect'
+        const accessToken = req.token;
         const userId = req.user.id;
     
         // 1. Invalider le Refresh Token (Suppression ou marquage)
@@ -127,8 +119,7 @@ class AuthController {
             expiresAt: new Date(decoded.exp * 1000)
           }
         });
-    
-        res.clearCookie('refreshToken');
+        
         res.status(200).json({ message: "Déconnexion réussie" });
       } catch (error) {
         res.status(500).json({ message: "Erreur lors de la déconnexion" });

@@ -5,7 +5,7 @@ import { de } from 'zod/locales';
 
 class TokenService {
     generateAuthTokens = async (user) => {
-        const accessTokenExpires = '15m';
+        const accessTokenExpires = process.env.JWT_EXPIRES_IN || '1h';
         const refreshTokenExpiresDays = 7;
         const expiresAt = new Date();
         expiresAt.setDate(expiresAt.getDate() + refreshTokenExpiresDays);
@@ -14,7 +14,7 @@ class TokenService {
         const accessTokenJti = uuidv4();
         const accessToken = jwt.sign(
             { sub: user.id, jti: accessTokenJti },
-            process.env.JWT_ACCESS_SECRET,
+            process.env.JWT_SECRET,
             { expiresIn: accessTokenExpires }
         );
 
