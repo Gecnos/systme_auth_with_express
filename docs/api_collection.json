@@ -1,0 +1,137 @@
+{
+    "yaak": "0.1.0",
+    "workspace": {
+        "id": "ws_profile_sessions",
+        "name": "Profile & Sessions",
+        "variables": [
+            {
+                "key": "base_url",
+                "value": "http://localhost:3000/api",
+                "enabled": true
+            },
+            {
+                "key": "access_token",
+                "value": "REPLACE_WITH_YOUR_TOKEN",
+                "enabled": true
+            }
+        ]
+    },
+    "folders": [
+        {
+            "id": "fld_profile",
+            "name": "Profile",
+            "sort": 100
+        },
+        {
+            "id": "fld_sessions",
+            "name": "Sessions",
+            "sort": 200
+        },
+        {
+            "id": "fld_history",
+            "name": "History",
+            "sort": 300
+        }
+    ],
+    "requests": [
+        {
+            "id": "req_get_profile",
+            "folderId": "fld_profile",
+            "name": "Get Profile",
+            "method": "GET",
+            "url": "${[base_url]}/users/me",
+            "headers": [
+                {
+                    "name": "Authorization",
+                    "value": "Bearer ${[access_token]}"
+                }
+            ]
+        },
+        {
+            "id": "req_update_profile",
+            "folderId": "fld_profile",
+            "name": "Update Profile",
+            "method": "PATCH",
+            "url": "${[base_url]}/users/me",
+            "headers": [
+                {
+                    "name": "Authorization",
+                    "value": "Bearer ${[access_token]}"
+                },
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                }
+            ],
+            "body": {
+                "firstName": "John",
+                "lastName": "Doe"
+            }
+        },
+        {
+            "id": "req_delete_account",
+            "folderId": "fld_profile",
+            "name": "Delete Account",
+            "method": "DELETE",
+            "url": "${[base_url]}/users/me",
+            "headers": [
+                {
+                    "name": "Authorization",
+                    "value": "Bearer ${[access_token]}"
+                }
+            ]
+        },
+        {
+            "id": "req_list_sessions",
+            "folderId": "fld_sessions",
+            "name": "List Sessions",
+            "method": "GET",
+            "url": "${[base_url]}/users/sessions",
+            "headers": [
+                {
+                    "name": "Authorization",
+                    "value": "Bearer ${[access_token]}"
+                }
+            ]
+        },
+        {
+            "id": "req_revoke_session",
+            "folderId": "fld_sessions",
+            "name": "Revoke Session",
+            "method": "DELETE",
+            "url": "${[base_url]}/users/sessions/SESSION_ID_HERE",
+            "headers": [
+                {
+                    "name": "Authorization",
+                    "value": "Bearer ${[access_token]}"
+                }
+            ]
+        },
+        {
+            "id": "req_revoke_others",
+            "folderId": "fld_sessions",
+            "name": "Revoke Other Sessions",
+            "method": "DELETE",
+            "url": "${[base_url]}/users/sessions",
+            "headers": [
+                {
+                    "name": "Authorization",
+                    "value": "Bearer ${[access_token]}"
+                }
+            ]
+        },
+        {
+            "id": "req_login_history",
+            "folderId": "fld_history",
+            "name": "Login History",
+            "method": "GET",
+            "url": "${[base_url]}/users/history",
+            "headers": [
+                {
+                    "name": "Authorization",
+                    "value": "Bearer ${[access_token]}"
+                }
+            ]
+        }
+    ]
+}
