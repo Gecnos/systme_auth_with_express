@@ -7,8 +7,8 @@ datasource db {
 }
 
 model User {
-  id                     String                   
-  email                  String                   
+  id                     String                   @id @default(cuid())
+  email                  String                   @unique
   password               String?                  
   firstName              String?
   lastName               String?
@@ -16,8 +16,8 @@ model User {
   twoFactorSecret        String?
   twoFactorEnabledAt     DateTime?
   disabledAt             DateTime?
-  createdAt              DateTime                 
-  updatedAt              DateTime                 
+  createdAt              DateTime                 @default(now())
+  updatedAt              DateTime                 @updatedAt
   
   // Relations
   oAuthAccounts          OAuthAccount[]
@@ -29,11 +29,11 @@ model User {
 }
 
 model OAuthAccount {
-  id         String   
+  id         String   @id @default(cuid())
   provider   String
   providerId String
   userId     String
-  createdAt  DateTime 
+  createdAt  DateTime @default(now())
 
   // Relation
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -42,17 +42,17 @@ model OAuthAccount {
 }
 
 model RefreshToken {
-  id         String    @id @default(cuid())
-  token      String    @unique
-  userId     String
-  userAgent  String?
-  ipAddress  String?
-  expiresAt  DateTime
-  revokedAt  DateTime?
-  createdAt  DateTime  @default(now())
+  id        String    @id @default(cuid())
+  token     String    @unique
+  userId    String
+  userAgent String?
+  ipAddress String?
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
 
   // Relation
-  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model BlacklistedAccessToken {

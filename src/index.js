@@ -6,6 +6,7 @@ import userRouter from './routes/user.routes.js';
 
 import passport from './config/passport.js';
 import oauth2faRouter from './routes/OAuth&2fa.routes.js'
+import authRouter from './routes/auth.routes.js';
 
 const app = express();
 
@@ -21,7 +22,8 @@ app.use(passport.initialize());
 
 // Routes
 app.use('/api/users', userRouter);
-app.use('/api/auth', oauth2faRouter); 
+app.use('/api/auth', authRouter);
+app.use('/api/auth', oauth2faRouter);
 
 app.use(notFoundHandler);
 app.use(errorHandler);
