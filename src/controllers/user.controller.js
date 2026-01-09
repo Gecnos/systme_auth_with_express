@@ -142,6 +142,23 @@ export const revokeSession = async (req, res, next) => {
   }
 };
 
+export const revokeOtherSessions = async (req, res, next) => {
+  try {
+    await prisma.refreshToken.updateMany({
+      where: {
+        userId: req.user.userId,
+        id: { not: req.user.sessionId },
+        revokedAt: null
+      },
+      data: { revokedAt: new Date() }
+    });
+
+    res.status(204).send();
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getLoginHistory = async (req, res, next) => {
   try {
     const history = await prisma.loginHistory.findMany({
