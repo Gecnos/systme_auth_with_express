@@ -2,6 +2,7 @@ import asyncHandler from "#lib/async-handler";
 import prisma from '../lib/prisma.js';
 import tokenService from "#services/token.service";
 import * as argon from "argon2"
+import jwt from 'jsonwebtoken';
 
 class AuthController {
     signup = asyncHandler(async (req, res, next)=>{
@@ -99,19 +100,11 @@ class AuthController {
     logout = asyncHandler(async (req, res) => {
       try {
         const accessToken = req.token;
-        const userId = req.user.id;
-    
-        // 1. Invalider le Refresh Token (Suppression ou marquage)
-        if (refreshToken) {
-          await prisma.refreshToken.deleteMany({
-            where: { token: refreshToken }
-          });
-        }
+        const userId = req.user.sub;
     
         // 2. Ajouter l'Access Token à la Blacklist
         // On récupère l'expiration du token pour savoir quand le supprimer de la blacklist
         const decoded = jwt.decode(accessToken);
-        
         await prisma.blacklistedAccessToken.create({
           data: {
             token: accessToken,
@@ -119,9 +112,10 @@ class AuthController {
             expiresAt: new Date(decoded.exp * 1000)
           }
         });
-        
+
         res.status(200).json({ message: "Déconnexion réussie" });
       } catch (error) {
+        console.log("error",error)
         res.status(500).json({ message: "Erreur lors de la déconnexion" });
       }
     })
