@@ -1,41 +1,40 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
 generator client {
   provider = "prisma-client-js"
 }
 
-datasource db {
-  provider = "sqlite"
-}
-
 model User {
-  id                     String                   
-  email                  String                   
-  password               String?                  
+  id                     String   @id @default(uuid())
+  email                  String   @unique
+  password               String?
   firstName              String?
   lastName               String?
   emailVerifiedAt        DateTime?
   twoFactorSecret        String?
   twoFactorEnabledAt     DateTime?
   disabledAt             DateTime?
-  createdAt              DateTime                 
-  updatedAt              DateTime                 
-  
-  // Relations
-  oAuthAccounts          OAuthAccount[]
-  refreshTokens          RefreshToken[]
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  oAuthAccounts           OAuthAccount[]
+  refreshTokens           RefreshToken[]
   blacklistedAccessTokens BlacklistedAccessToken[]
-  verificationTokens     VerificationToken[]
-  passwordResetTokens    PasswordResetToken[]
-  loginHistories         LoginHistory[]
+  verificationTokens      VerificationToken[]
+  passwordResetTokens     PasswordResetToken[]
+  loginHistories          LoginHistory[]
 }
 
 model OAuthAccount {
-  id         String   
+  id         String   @id @default(cuid())
   provider   String
   providerId String
   userId     String
-  createdAt  DateTime 
+  createdAt  DateTime @default(now())
 
-  // Relation
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerId])
@@ -51,7 +50,6 @@ model RefreshToken {
   revokedAt  DateTime?
   createdAt  DateTime  @default(now())
 
-  // Relation
   user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
@@ -62,7 +60,6 @@ model BlacklistedAccessToken {
   expiresAt DateTime
   createdAt DateTime @default(now())
 
-  // Relation
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
@@ -73,7 +70,6 @@ model VerificationToken {
   expiresAt DateTime
   createdAt DateTime @default(now())
 
-  // Relation
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
@@ -84,7 +80,6 @@ model PasswordResetToken {
   expiresAt DateTime
   createdAt DateTime @default(now())
 
-  // Relation
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
@@ -94,9 +89,8 @@ model LoginHistory {
   ipAddress   String?
   userAgent   String?
   success     Boolean
-  loginMethod String?  // "standard", "oauth", "2fa"
+  loginMethod String?
   createdAt   DateTime @default(now())
 
-  // Relation
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
