@@ -1,7 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
 import prisma from '../lib/prisma.js';
-import { de } from 'zod/locales';
 
 class TokenService {
     generateAuthTokens = async (user) => {
@@ -10,29 +9,33 @@ class TokenService {
         const expiresAt = new Date();
         expiresAt.setDate(expiresAt.getDate() + refreshTokenExpiresDays);
 
-        // 1. Access Token avec un JTI (JWT ID) pour la blacklist
-        const accessTokenJti = uuidv4();
-        const accessToken = jwt.sign(
-            { sub: user.id, jti: accessTokenJti },
-            process.env.JWT_SECRET,
-            { expiresIn: accessTokenExpires }
-        );
+        // 1. Generate Refresh Token unique
+        const refreshTokenValue = uuidv4();
 
-        // 2. Refresh Token unique
-        const refreshToken = uuidv4();
-
-        // 3. Enregistrement en base (Whitelist)
-        await prisma.refreshToken.create({
+        // 2. Enregistrement en base (Whitelist)
+        const refreshTokenEntry = await prisma.refreshToken.create({
             data: {
-                token: refreshToken,
+                token: refreshTokenValue,
                 userId: user.id,
                 expiresAt: expiresAt
             }
         });
 
+        // 3. Access Token avec un JTI (JWT ID) et sessionId (RefreshToken ID)
+        const accessTokenJti = uuidv4();
+        const accessToken = jwt.sign(
+            {
+                sub: user.id,
+                jti: accessTokenJti,
+                sessionId: refreshTokenEntry.id
+            },
+            process.env.JWT_SECRET,
+            { expiresIn: accessTokenExpires }
+        );
+
         return {
             access: { token: accessToken, jti: accessTokenJti },
-            refresh: { token: refreshToken, expiresAt }
+            refresh: { token: refreshTokenValue, expiresAt }
         };
     }
 }

@@ -1,5 +1,5 @@
-import { HttpException } from "#lib/exceptions";
-import { logger } from "#lib/logger";
+import { HttpException } from "../lib/exceptions.js";
+import { logger } from "../lib/logger.js";
 
 export function errorHandler(err, req, res, next) {
   if (err instanceof HttpException) {

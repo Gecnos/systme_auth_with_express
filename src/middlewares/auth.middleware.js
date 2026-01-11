@@ -20,9 +20,20 @@ export const authMiddleware = async (req, res, next) => {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    // Check if user is disabled
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.sub },
+      select: { disabledAt: true }
+    });
+
+    if (user?.disabledAt) {
+      throw new UnauthorizedException("Compte désactivé");
+    }
+
     req.user = decoded;
     req.token = token;
-    
+
     next();
   } catch (error) {
     next(error);

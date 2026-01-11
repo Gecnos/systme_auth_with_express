@@ -4,7 +4,7 @@ import { NotFoundException } from '../lib/exceptions.js';
 export const getProfile = async (req, res, next) => {
   try {
     const user = await prisma.user.findUnique({
-      where: { id: req.user.userId },
+      where: { id: req.user.sub },
       select: {
         id: true,
         email: true,
@@ -31,8 +31,16 @@ export const updateProfile = async (req, res, next) => {
   try {
     const { firstName, lastName } = req.body;
 
+    // Basic validation
+    if (firstName && (typeof firstName !== 'string' || firstName.length > 50)) {
+      return res.status(400).json({ message: "Prénom invalide" });
+    }
+    if (lastName && (typeof lastName !== 'string' || lastName.length > 50)) {
+      return res.status(400).json({ message: "Nom invalide" });
+    }
+
     const updatedUser = await prisma.user.update({
-      where: { id: req.user.userId },
+      where: { id: req.user.sub },
       data: {
         firstName,
         lastName,
@@ -58,7 +66,7 @@ export const updateProfile = async (req, res, next) => {
 export const deleteAccount = async (req, res, next) => {
   try {
     await prisma.user.update({
-      where: { id: req.user.userId },
+      where: { id: req.user.sub },
       data: {
         disabledAt: new Date()
       }
@@ -66,7 +74,7 @@ export const deleteAccount = async (req, res, next) => {
 
     await prisma.refreshToken.updateMany({
       where: {
-        userId: req.user.userId,
+        userId: req.user.sub,
         revokedAt: null
       },
       data: {
@@ -79,7 +87,7 @@ export const deleteAccount = async (req, res, next) => {
       await prisma.blacklistedAccessToken.create({
         data: {
           token,
-          userId: req.user.userId,
+          userId: req.user.sub,
           expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24h
         }
       });
@@ -95,7 +103,7 @@ export const listSessions = async (req, res, next) => {
   try {
     const sessions = await prisma.refreshToken.findMany({
       where: {
-        userId: req.user.userId,
+        userId: req.user.sub,
         revokedAt: null,
         expiresAt: {
           gt: new Date()
@@ -127,7 +135,7 @@ export const revokeSession = async (req, res, next) => {
       where: { id: sessionId }
     });
 
-    if (!session || session.userId !== req.user.userId) {
+    if (!session || session.userId !== req.user.sub) {
       throw new NotFoundException('Session non trouvée');
     }
 
@@ -146,7 +154,7 @@ export const revokeOtherSessions = async (req, res, next) => {
   try {
     await prisma.refreshToken.updateMany({
       where: {
-        userId: req.user.userId,
+        userId: req.user.sub,
         id: { not: req.user.sessionId },
         revokedAt: null
       },
@@ -162,7 +170,7 @@ export const revokeOtherSessions = async (req, res, next) => {
 export const getLoginHistory = async (req, res, next) => {
   try {
     const history = await prisma.loginHistory.findMany({
-      where: { userId: req.user.userId },
+      where: { userId: req.user.sub },
       orderBy: { createdAt: 'desc' },
       take: 20,
       select: {

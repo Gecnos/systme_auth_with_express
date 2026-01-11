@@ -1,11 +1,11 @@
-import asyncHandler from "#lib/async-handler";
+import asyncHandler from "../lib/async-handler.js";
 import prisma from '../lib/prisma.js';
-import tokenService from "#services/token.service";
+import tokenService from "../services/token.service.js";
 import * as argon from "argon2"
 import jwt from 'jsonwebtoken';
 
 class AuthController {
-    signup = asyncHandler(async (req, res, next)=>{
+    signup = asyncHandler(async (req, res, next) => {
         const { email, password, firstName, lastName } = req.body;
         // Validate email
         if (!email) {
@@ -46,7 +46,7 @@ class AuthController {
         if (!user) {
             return next(new Error("Invalid email or password"));
         }
-        
+
         // Verify password
         const isValid = await argon.verify(user.password, password);
         if (!isValid) {
@@ -56,12 +56,19 @@ class AuthController {
         // Generate tokens
         const tokens = await tokenService.generateAuthTokens(user);
 
+        // Set refresh token in cookies
+        res.cookie('refreshToken', tokens.refresh.token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            expires: tokens.refresh.expiresAt
+        });
+
         res.status(200).json({
             status: "success",
             data: {
                 user,
-                accessToken: tokens.access.token,
-                refreshToken: tokens.refresh.token
+                accessToken: tokens.access.token
             }
         });
     })
@@ -79,15 +86,27 @@ class AuthController {
             include: { user: true }
         });
 
-        if (!tokenData || tokenData.revoked) {
+        if (!tokenData || tokenData.revokedAt || tokenData.expiresAt < new Date()) {
+            res.clearCookie('refreshToken');
             return next(new Error("Invalid or expired refresh token"));
         }
 
         // Generate new tokens
         const tokens = await tokenService.generateAuthTokens(tokenData.user);
 
+        // Revoke the old refresh token
+        await prisma.refreshToken.update({
+            where: { id: tokenData.id },
+            data: { revokedAt: new Date() }
+        });
+
         // Set new refresh token in cookies
-        res.cookie('refreshToken', tokens.refresh.token, { httpOnly: true, secure: true });
+        res.cookie('refreshToken', tokens.refresh.token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            expires: tokens.refresh.expiresAt
+        });
 
         res.status(200).json({
             status: "success",
@@ -98,26 +117,37 @@ class AuthController {
     })
 
     logout = asyncHandler(async (req, res) => {
-      try {
-        const accessToken = req.token;
-        const userId = req.user.sub;
-    
-        // 2. Ajouter l'Access Token à la Blacklist
-        // On récupère l'expiration du token pour savoir quand le supprimer de la blacklist
-        const decoded = jwt.decode(accessToken);
-        await prisma.blacklistedAccessToken.create({
-          data: {
-            token: accessToken,
-            userId: userId,
-            expiresAt: new Date(decoded.exp * 1000)
-          }
-        });
+        try {
+            const accessToken = req.token;
+            const userId = req.user.sub;
+            const sessionId = req.user.sessionId;
 
-        res.status(200).json({ message: "Déconnexion réussie" });
-      } catch (error) {
-        console.log("error",error)
-        res.status(500).json({ message: "Erreur lors de la déconnexion" });
-      }
+            // 1. Révoker le Refresh Token
+            if (sessionId) {
+                await prisma.refreshToken.updateMany({
+                    where: { id: sessionId, userId },
+                    data: { revokedAt: new Date() }
+                });
+            }
+
+            // 2. Ajouter l'Access Token à la Blacklist
+            const decoded = jwt.decode(accessToken);
+            await prisma.blacklistedAccessToken.create({
+                data: {
+                    token: accessToken,
+                    userId: userId,
+                    expiresAt: new Date(decoded.exp * 1000)
+                }
+            });
+
+            // 3. Effacer le cookie
+            res.clearCookie('refreshToken');
+
+            res.status(200).json({ message: "Déconnexion réussie" });
+        } catch (error) {
+            console.log("error", error)
+            res.status(500).json({ message: "Erreur lors de la déconnexion" });
+        }
     })
 }
 export default new AuthController();
