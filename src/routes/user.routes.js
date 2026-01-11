@@ -1,20 +1,31 @@
 import { Router } from 'express';
 import { authMiddleware } from '../middlewares/auth.middleware.js';
-import * as userController from '../controllers/user.controller.js';
+import {
+  getProfile,
+  updateProfile,
+  deleteAccount,
+  listSessions,
+  revokeSession,
+  revokeOtherSessions,
+  getLoginHistory
+} from '../controllers/user.controller.js';
 
 const router = Router();
 
-// Toutes les routes ci-dessous nécessitent une authentification
+// Toutes ces routes nécessitent une authentification
 router.use(authMiddleware);
 
-// Gestion du profil
-router.get('/me', userController.getProfile);
-router.patch('/me', userController.updateProfile);
-router.delete('/me', userController.deleteAccount);
+// Profil
+router.get('/profile', getProfile);
+router.put('/profile', updateProfile);
+router.delete('/profile', deleteAccount);
 
-// Gestion des sessions
-router.get('/sessions', userController.listSessions);
-router.delete('/sessions/:sessionId', userController.revokeSession);
-router.delete('/sessions', userController.revokeOtherSessions);
+// Sessions
+router.get('/sessions', listSessions);
+router.delete('/sessions/:sessionId', revokeSession);
+router.delete('/sessions', revokeOtherSessions);
+
+// Historique
+router.get('/login-history', getLoginHistory);
 
 export default router;

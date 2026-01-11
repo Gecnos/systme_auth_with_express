@@ -19,7 +19,17 @@ export const authMiddleware = async (req, res, next) => {
       throw new UnauthorizedException("Token révoqué");
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (jwtError) {
+      if (jwtError.name === 'TokenExpiredError') {
+        throw new UnauthorizedException("Token expiré");
+      } else if (jwtError.name === 'JsonWebTokenError') {
+        throw new UnauthorizedException("Token invalide");
+      }
+      throw new UnauthorizedException("Erreur de vérification du token");
+    }
     
     req.user = decoded;
     

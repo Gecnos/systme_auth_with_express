@@ -1,23 +1,26 @@
 type: http_request
 model: http_request
-id: rq_3FRkiXR4zd
-createdAt: 2025-12-29T10:57:37.406006100
-updatedAt: 2026-01-11T22:14:41.674859200
+id: rq_aKw6K8XqFH
+createdAt: 2026-01-11T22:58:04.897645300
+updatedAt: 2026-01-11T22:58:53.835796
 workspaceId: wk_GmREP2U9P8
 folderId: null
 authentication: {}
 authenticationType: null
 body:
-  text: ''
+  text: |-
+    {
+      "email": "vianneyhoueho@gmail.com"
+    }
 bodyType: application/json
 description: ''
 headers:
 - enabled: true
   name: Content-Type
   value: application/json
-  id: hhShjubBA3
-method: GET
+  id: vxgYWnZYQJ
+method: POST
 name: ''
-sortPriority: -1766999143927.0
-url: ${[ base_url ]}/health
+sortPriority: -1177999429284.6665
+url: ${[ base_url ]}/api/password/forgot
 urlParameters: []

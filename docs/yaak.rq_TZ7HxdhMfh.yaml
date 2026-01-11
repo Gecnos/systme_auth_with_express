@@ -1,0 +1,34 @@
+type: http_request
+model: http_request
+id: rq_TZ7HxdhMfh
+createdAt: 2026-01-11T23:07:52.256847800
+updatedAt: 2026-01-11T23:09:12.437710800
+workspaceId: wk_GmREP2U9P8
+folderId: null
+authentication: {}
+authenticationType: null
+body:
+  text: |-
+    {
+      "token": "906209"
+    }
+bodyType: application/json
+description: ''
+headers:
+- enabled: true
+  name: Authorization
+  value: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJiYjMzY2IyOS0zYzU3LTRiMDktYjA1Yy1jYTQzOWQxOTdkNWYiLCJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJpYXQiOjE3NjgxNzIxNjcsImV4cCI6MTc2ODE3NTc2N30.v3YUloKdJuWgTP1QcOSrACoKNfkMDzgVbxCEcXaXMRA '
+  id: GmqDmfShgS
+- enabled: true
+  name: ''
+  value: ''
+  id: 5zBpSGaxgQ
+- enabled: true
+  name: Content-Type
+  value: application/json
+  id: 0f67VKpX5u
+method: POST
+name: ''
+sortPriority: -1177999429284.6665
+url: ${[ base_url ]}/api/auth/2fa/verify
+urlParameters: []

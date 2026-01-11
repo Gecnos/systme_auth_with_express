@@ -1,0 +1,26 @@
+type: http_request
+model: http_request
+id: rq_2tp3ZJHYRt
+createdAt: 2026-01-11T22:41:17.447192
+updatedAt: 2026-01-11T22:45:03.709090100
+workspaceId: wk_GmREP2U9P8
+folderId: null
+authentication: {}
+authenticationType: null
+body: {}
+bodyType: null
+description: ''
+headers:
+- enabled: true
+  name: Authorization
+  value: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJiYjMzY2IyOS0zYzU3LTRiMDktYjA1Yy1jYTQzOWQxOTdkNWYiLCJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJpYXQiOjE3NjgxNzE0NjYsImV4cCI6MTc2ODE3NTA2Nn0.Jedpp1UPyUwjxbNk1zYHqBnMlUBc1gN6XiGXNOnQ7zA
+  id: PCsPRVZ3Xu
+- enabled: true
+  name: ''
+  value: ''
+  id: PqHBwXs9mA
+method: GET
+name: ''
+sortPriority: -1177999429284.6665
+url: ${[ base_url ]}/api/users/profile
+urlParameters: []

@@ -1,7 +1,10 @@
 import twoFactorService from '../services/2fa.service.js';
-import { generateToken, verifyToken } from '../services/Token.service.js';
 import asyncHandler from '../lib/async-handler.js';
 import jwt from 'jsonwebtoken';
+import prisma from '../lib/prisma.js';
+import { sign } from '../lib/jwt.js';
+import { generateToken } from '../services/Token.service.js';
+import { hashPassword, comparePassword } from '../lib/password.js';
 
 class TwoFactorController {
  
@@ -72,14 +75,30 @@ class TwoFactorController {
     const ipAddress = req.ip || req.socket.remoteAddress || 'unknown';
     const userAgent = req.get('user-agent') || 'unknown';
     
-    // TODO Ferdinande: Créer tokenService.generateTokens(userId, ipAddress, userAgent)
-    // Doit retourner { accessToken, refreshToken }
-    const tokens = await tokenService.generateTokens(decoded.userId, ipAddress, userAgent);
+    // Générer les tokens
+    const user = await prisma.user.findUnique({ where: { id: decoded.userId } });
+    const accessToken = sign(
+      { userId: user.id, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' }
+    );
+    const refreshTokenValue = generateToken();
+    
+    // Créer un refresh token
+    await prisma.refreshToken.create({
+      data: {
+        userId: user.id,
+        token: refreshTokenValue,
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        ipAddress,
+        userAgent
+      }
+    });
 
     res.json({
       message: 'Connexion réussie avec 2FA',
-      accessToken: tokens.accessToken,
-      refreshToken: tokens.refreshToken,
+      accessToken,
+      refreshToken: refreshTokenValue,
     });
   });
 
@@ -92,9 +111,16 @@ class TwoFactorController {
       return res.status(400).json({ error: 'Mot de passe requis' });
     }
 
-    // Ferdinande: Créer authService.verifyPassword(userId, password)
-    // une exception si le mot de passe est incorrect
-    await authService.verifyPassword(userId, password);
+    // Vérifier le mot de passe
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user || !user.password) {
+      return res.status(401).json({ error: 'Utilisateur non trouvé' });
+    }
+    
+    const isPasswordValid = await comparePassword(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(401).json({ error: 'Mot de passe incorrect' });
+    }
 
     const result = await twoFactorService.disable(userId);
     res.json(result);
