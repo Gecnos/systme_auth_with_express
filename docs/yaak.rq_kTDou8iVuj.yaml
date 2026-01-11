@@ -1,0 +1,35 @@
+type: http_request
+model: http_request
+id: rq_kTDou8iVuj
+createdAt: 2026-01-11T22:55:16.332407800
+updatedAt: 2026-01-11T22:57:28.353050600
+workspaceId: wk_GmREP2U9P8
+folderId: null
+authentication: {}
+authenticationType: null
+body:
+  text: |-
+    {
+      "firstName": "Johnny",
+      "lastName": "Doeson"
+    }
+bodyType: application/json
+description: ''
+headers:
+- enabled: true
+  name: Authorization
+  value: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJiYjMzY2IyOS0zYzU3LTRiMDktYjA1Yy1jYTQzOWQxOTdkNWYiLCJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJpYXQiOjE3NjgxNzIxNjcsImV4cCI6MTc2ODE3NTc2N30.v3YUloKdJuWgTP1QcOSrACoKNfkMDzgVbxCEcXaXMRA
+  id: MMj9HmrJ7S
+- enabled: true
+  name: ''
+  value: ''
+  id: BxpGKAHxZb
+- enabled: true
+  name: Content-Type
+  value: application/json
+  id: 6Uie8kpaJT
+method: PUT
+name: ''
+sortPriority: -1177999429284.6665
+url: ${[ base_url ]}/api/users/profile
+urlParameters: []

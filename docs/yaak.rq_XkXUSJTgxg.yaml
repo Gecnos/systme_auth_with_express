@@ -1,0 +1,23 @@
+type: http_request
+model: http_request
+id: rq_XkXUSJTgxg
+createdAt: 2025-12-29T09:05:43.930153500
+updatedAt: 2026-01-11T22:15:08.432936400
+workspaceId: wk_GmREP2U9P8
+folderId: null
+authentication: {}
+authenticationType: null
+body:
+  text: ''
+bodyType: application/json
+description: ''
+headers:
+- enabled: true
+  name: Content-Type
+  value: application/json
+  id: h820KprqQb
+method: GET
+name: ''
+sortPriority: -1177999429284.6665
+url: ${[ base_url ]}/api/inexistant
+urlParameters: []

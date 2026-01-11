@@ -1,0 +1,33 @@
+type: http_request
+model: http_request
+id: rq_zm7DPQw2Be
+createdAt: 2026-01-11T22:15:25.888214300
+updatedAt: 2026-01-11T22:49:03.822995700
+workspaceId: wk_GmREP2U9P8
+folderId: null
+authentication: {}
+authenticationType: null
+body:
+  text: |-
+    {
+      "email": "vianneyhoueho@gmail.com",
+      "password":  "Vianney...",
+      "firstName": "Vianney",
+      "lastName": "HOUEHO"
+    }
+bodyType: application/json
+description: ''
+headers:
+- enabled: true
+  name: ''
+  value: ''
+  id: fFcScrY8a2
+- enabled: true
+  name: Content-Type
+  value: application/json
+  id: C2qBpj3MyQ
+method: POST
+name: ''
+sortPriority: -1177999429284.6665
+url: ${[ base_url ]}/api/auth/register
+urlParameters: []

@@ -1,0 +1,18 @@
+type: http_request
+model: http_request
+id: rq_5BRHqoiCWd
+createdAt: 2026-01-11T22:52:15.262781400
+updatedAt: 2026-01-11T22:54:45.118059200
+workspaceId: wk_GmREP2U9P8
+folderId: null
+authentication: {}
+authenticationType: null
+body: {}
+bodyType: null
+description: ''
+headers: []
+method: GET
+name: ''
+sortPriority: -1177999429284.6665
+url: ${[ base_url ]}/api/email/verify/cb18906ab28c52e193f9c05cbc903011582887ecaa307eb0e02da0b8a0a135c5
+urlParameters: []

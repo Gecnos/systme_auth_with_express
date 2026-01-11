@@ -1,0 +1,14 @@
+type: workspace
+model: workspace
+id: wk_GmREP2U9P8
+createdAt: 2025-12-29T09:04:27.637627200
+updatedAt: 2025-12-29T09:04:27.637628100
+authentication: {}
+authenticationType: null
+description: ''
+headers: []
+name: TP_Auth_API
+encryptionKeyChallenge: null
+settingValidateCertificates: true
+settingFollowRedirects: true
+settingRequestTimeout: 0

@@ -1,0 +1,32 @@
+type: http_request
+model: http_request
+id: rq_pVcai8uLc7
+createdAt: 2026-01-11T22:24:51.526809500
+updatedAt: 2026-01-11T23:10:20.122939
+workspaceId: wk_GmREP2U9P8
+folderId: null
+authentication: {}
+authenticationType: null
+body:
+  text: |-
+    {
+      "email": "test@example.com",
+      "password": "SecurePass123!",
+      "twoFactorCode": "310750"
+    }
+bodyType: application/json
+description: ''
+headers:
+- enabled: true
+  name: Content-Type
+  value: application/json
+  id: PSrMGAN5TQ
+- enabled: true
+  name: ''
+  value: ''
+  id: 8PI09GzH4p
+method: POST
+name: ''
+sortPriority: -1177999429284.6665
+url: ${[ base_url ]}/api/auth/login
+urlParameters: []
