@@ -1,5 +1,6 @@
 import twoFactorService from '../services/2fa.service.js';
 import tokenService from '../services/token.service.js';
+import authService from '../services/auth.service.js';
 import asyncHandler from '../lib/async-handler.js';
 import jwt from 'jsonwebtoken';
 
