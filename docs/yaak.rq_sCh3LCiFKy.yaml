@@ -1,0 +1,26 @@
+type: http_request
+model: http_request
+id: rq_sCh3LCiFKy
+createdAt: 2026-01-24T08:57:12.706815300
+updatedAt: 2026-01-24T09:12:39.926159100
+workspaceId: wk_GmREP2U9P8
+folderId: null
+authentication: {}
+authenticationType: null
+body: {}
+bodyType: null
+description: ''
+headers:
+- enabled: true
+  name: Authorization
+  value: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJiYjMzY2IyOS0zYzU3LTRiMDktYjA1Yy1jYTQzOWQxOTdkNWYiLCJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJpYXQiOjE3NjkyNDUyMjMsImV4cCI6MTc2OTI0ODgyM30.JOKEmLj2q0SqlGUxiS6vpgZPI5fF1ZhImotbwOTSz50
+  id: 65sWeUSP4s
+- enabled: true
+  name: ''
+  value: ''
+  id: xaQuHh4gyz
+method: POST
+name: ''
+sortPriority: 6000.0
+url: ${[ base_url ]}/api/auth/logout
+urlParameters: []

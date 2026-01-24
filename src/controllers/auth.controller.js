@@ -177,7 +177,7 @@ export const login = async (req, res, next) => {
  */
 export const refreshToken = async (req, res, next) => {
   try {
-    const { refreshToken: refreshTokenValue } = req.body;
+    const { refreshToken: refreshTokenValue } = req.body || {};
 
     if (!refreshTokenValue) {
       throw new BadRequestException('Refresh token manquant');
@@ -228,7 +228,12 @@ export const logout = async (req, res, next) => {
       await prisma.blacklistedAccessToken.create({
         data: {
           token,
-          expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 heures
+          expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 heures
+          user: {
+            connect: {
+              id: req.user.userId
+            }
+          }
         }
       });
     }

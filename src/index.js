@@ -38,7 +38,7 @@ app.use(passport.initialize());
 app.get('/', (req, res) => {
   res.json({
     status: 'OK',
-    message: '🚀 API Système d\'authentification',
+    message: 'API Système d\'authentification',
     version: '1.0.0',
     timestamp: new Date().toISOString(),
     endpoints: {
