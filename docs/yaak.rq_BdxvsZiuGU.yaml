@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_BdxvsZiuGU
 createdAt: 2026-01-11T23:10:41.522179100
-updatedAt: 2026-01-11T23:10:53.167879400
+updatedAt: 2026-01-13T14:19:59.022249900
 workspaceId: wk_GmREP2U9P8
 folderId: null
 authentication: {}
@@ -11,8 +11,8 @@ body: {}
 bodyType: null
 description: ''
 headers: []
-method: GET
+method: POST
 name: ''
 sortPriority: -1177999429284.6665
-url: ${[ base_url ]}/api/auth/google
+url: ''
 urlParameters: []
