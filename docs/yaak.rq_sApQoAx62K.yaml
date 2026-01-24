@@ -1,8 +1,8 @@
 type: http_request
 model: http_request
-id: rq_aKw6K8XqFH
-createdAt: 2026-01-11T22:58:04.897645300
-updatedAt: 2026-01-24T09:12:47.943951700
+id: rq_sApQoAx62K
+createdAt: 2026-01-24T09:11:59.260877400
+updatedAt: 2026-01-24T09:14:57.551061800
 workspaceId: wk_GmREP2U9P8
 folderId: null
 authentication: {}
@@ -10,7 +10,7 @@ authenticationType: null
 body:
   text: |-
     {
-      "email": "gecnosv@gmail.com"
+      "token": "0e0fd07a245d12e6a1f955975f8d07ec835c0c25912224d69700e8a46f867cfc"
     }
 bodyType: application/json
 description: ''
@@ -18,9 +18,9 @@ headers:
 - enabled: true
   name: Content-Type
   value: application/json
-  id: vxgYWnZYQJ
+  id: 50YsJCIQYV
 method: POST
 name: ''
-sortPriority: 11000.0
-url: ${[ base_url ]}/api/password/forgot
+sortPriority: 12000.0
+url: ${[ base_url ]}/api/password/validate-token
 urlParameters: []

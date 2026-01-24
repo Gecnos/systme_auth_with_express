@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_5BRHqoiCWd
 createdAt: 2026-01-11T22:52:15.262781400
-updatedAt: 2026-01-11T22:54:45.118059200
+updatedAt: 2026-01-24T09:12:40.001945100
 workspaceId: wk_GmREP2U9P8
 folderId: null
 authentication: {}
@@ -13,6 +13,6 @@ description: ''
 headers: []
 method: GET
 name: ''
-sortPriority: -1177999429284.6665
-url: ${[ base_url ]}/api/email/verify/cb18906ab28c52e193f9c05cbc903011582887ecaa307eb0e02da0b8a0a135c5
+sortPriority: 10000.0
+url: ${[ base_url ]}/api/email/verify/07997ea25db423f4a205a65c7753e6c9ee501b22d4d6ab32087d8c5be7c0648c
 urlParameters: []

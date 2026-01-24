@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_kTDou8iVuj
 createdAt: 2026-01-11T22:55:16.332407800
-updatedAt: 2026-01-11T22:57:28.353050600
+updatedAt: 2026-01-24T09:12:39.964092300
 workspaceId: wk_GmREP2U9P8
 folderId: null
 authentication: {}
@@ -10,7 +10,7 @@ authenticationType: null
 body:
   text: |-
     {
-      "firstName": "Johnny",
+      "firstName": "Johny",
       "lastName": "Doeson"
     }
 bodyType: application/json
@@ -18,18 +18,18 @@ description: ''
 headers:
 - enabled: true
   name: Authorization
-  value: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJiYjMzY2IyOS0zYzU3LTRiMDktYjA1Yy1jYTQzOWQxOTdkNWYiLCJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJpYXQiOjE3NjgxNzIxNjcsImV4cCI6MTc2ODE3NTc2N30.v3YUloKdJuWgTP1QcOSrACoKNfkMDzgVbxCEcXaXMRA
+  value: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJiYjMzY2IyOS0zYzU3LTRiMDktYjA1Yy1jYTQzOWQxOTdkNWYiLCJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJpYXQiOjE3NjkyNDU2NjEsImV4cCI6MTc2OTI0OTI2MX0.URAZCHiuL8JcdZmh6AA_XaDLUiaMrTgJnbIYyHdrj9c
   id: MMj9HmrJ7S
-- enabled: true
-  name: ''
-  value: ''
-  id: BxpGKAHxZb
 - enabled: true
   name: Content-Type
   value: application/json
   id: 6Uie8kpaJT
+- enabled: true
+  name: ''
+  value: ''
+  id: yMnmVznTzx
 method: PUT
 name: ''
-sortPriority: -1177999429284.6665
+sortPriority: 8000.0
 url: ${[ base_url ]}/api/users/profile
 urlParameters: []

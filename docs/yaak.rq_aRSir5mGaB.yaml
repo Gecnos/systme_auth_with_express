@@ -1,8 +1,8 @@
 type: http_request
 model: http_request
-id: rq_2tp3ZJHYRt
-createdAt: 2026-01-11T22:41:17.447192
-updatedAt: 2026-01-24T09:12:39.943383600
+id: rq_aRSir5mGaB
+createdAt: 2026-01-24T08:58:19.402342200
+updatedAt: 2026-01-24T09:12:39.983899700
 workspaceId: wk_GmREP2U9P8
 folderId: null
 authentication: {}
@@ -14,13 +14,13 @@ headers:
 - enabled: true
   name: Authorization
   value: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJiYjMzY2IyOS0zYzU3LTRiMDktYjA1Yy1jYTQzOWQxOTdkNWYiLCJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJpYXQiOjE3NjkyNDU2NjEsImV4cCI6MTc2OTI0OTI2MX0.URAZCHiuL8JcdZmh6AA_XaDLUiaMrTgJnbIYyHdrj9c
-  id: PCsPRVZ3Xu
+  id: qPcg84XXSB
 - enabled: true
   name: ''
   value: ''
-  id: SuQfsPRFwr
-method: GET
-name: base_url/api/users/profile
-sortPriority: 7000.0
+  id: cRddDPp6Zm
+method: DELETE
+name: ''
+sortPriority: 9000.0
 url: ${[ base_url ]}/api/users/profile
 urlParameters: []

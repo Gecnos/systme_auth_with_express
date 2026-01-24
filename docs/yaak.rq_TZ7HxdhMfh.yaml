@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_TZ7HxdhMfh
 createdAt: 2026-01-11T23:07:52.256847800
-updatedAt: 2026-01-11T23:09:12.437710800
+updatedAt: 2026-01-24T09:32:35.557082700
 workspaceId: wk_GmREP2U9P8
 folderId: null
 authentication: {}
@@ -10,25 +10,25 @@ authenticationType: null
 body:
   text: |-
     {
-      "token": "906209"
+      "token": "100202"
     }
 bodyType: application/json
 description: ''
 headers:
 - enabled: true
   name: Authorization
-  value: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJiYjMzY2IyOS0zYzU3LTRiMDktYjA1Yy1jYTQzOWQxOTdkNWYiLCJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJpYXQiOjE3NjgxNzIxNjcsImV4cCI6MTc2ODE3NTc2N30.v3YUloKdJuWgTP1QcOSrACoKNfkMDzgVbxCEcXaXMRA '
+  value: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MjY2MjhiYS03YmYwLTRmMTMtOTRmYS00ZWIwMTYzMDdmNWYiLCJlbWFpbCI6ImdlY25vc3ZAZ21haWwuY29tIiwiaWF0IjoxNzY5MjQ2NTMxLCJleHAiOjE3NjkyNTAxMzF9.lCj2nPNYS9rz94L6yHcevyXwsqFkhCt1YouI1wbhW9E
   id: GmqDmfShgS
-- enabled: true
-  name: ''
-  value: ''
-  id: 5zBpSGaxgQ
 - enabled: true
   name: Content-Type
   value: application/json
   id: 0f67VKpX5u
+- enabled: true
+  name: ''
+  value: ''
+  id: VR23RkpUHC
 method: POST
 name: ''
-sortPriority: -1177999429284.6665
+sortPriority: 14000.0
 url: ${[ base_url ]}/api/auth/2fa/verify
 urlParameters: []
